@@ -61,6 +61,27 @@ services:
     depends_on:
       q-rabbitmq:
         condition: service_healthy
-
+  
+  report-service:
+    container_name: report-service
+    build:
+      context: ./services/report
+    volumes:
+      - ./services/report:/app
+    depends_on:
+      q-rabbitmq:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=production
+      - RABBITMQ_LOGIN=guest           # Usuário padrão do RabbitMQ (padrão: guest)
+      - RABBITMQ_PASSWORD=guest        # Senha padrão do RabbitMQ (padrão: guest)
+      - RABBITMQ_HOST=q-rabbitmq       # Hostname do container RabbitMQ (veja 'hostname: q-rabbitmq-broker', mas o serviço é 'q-rabbitmq')
+      - RABBITMQ_PORT=5672             # Porta padrão AMQP do RabbitMQ
+      - RABBITMQ_VHOST=/               # Virtual Host padrão do RabbitMQ
+      - RABBITMQ_URL=amqp://guest:guest@q-rabbitmq:5672/
+    networks:
+      - q-rabbitmq-network
+  
+    
 networks:
   q-rabbitmq-network:
